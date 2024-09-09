@@ -77,12 +77,13 @@ require(dirname(__FILE__)."/../../../../main/include/php/incl_lbsexec.php");
 sql_connect();
 //-------------------------------------------------------------------------------------
 if ($E=logic_getInputs($id)) {
-    $baseUrl="https://www.aponet.de/apotheke/notdienstsuche?tx_aponetpharmacy_search[action]=result&type=1981&tx_aponetpharmacy_search[search][plzort]=";
-    $ctx=stream_context_create(array('http' => array('timeout' => $E[3]['value'] )));
-    $url = $baseUrl . $E[2]['value'];
+    $baseUrl="https://www.aponet.de/apotheke/notdienstsuche?tx_aponetpharmacy_search=result&tx_aponetpharmacy_search=Search&tx_aponetpharmacy_search={plz}&tx_aponetpharmacy_search=1&tx_aponetpharmacy_search=216823d96ea25c051509d935955c130fbc72680fc1d3040fe3f8ca0e25f9cd08&type=1981";
+    $baseUrl="https://www.aponet.de/apotheke/notdienstsuche?tx_aponetpharmacy_search=result&tx_aponetpharmacy_search=Search&tx_aponetpharmacy_search={plz}&tx_aponetpharmacy_search=1&tx_aponetpharmacy_search=216823d96ea25c051509d935955c130fbc72680fc1d3040fe3f8ca0e25f9cd08&type=1981";
+    $url = str_replace('{plz}',$E,$baseUrl);
+    $ctx=stream_context_create(array('http' => array('timeout' => $E )));
     $json_result = json_decode(file_get_contents($url,false,$ctx));
     
-    $next_apo = $json_result->features[0]->properties;
+    $next_apo = $json_result->results->apotheken->apotheke;​
     if(empty($next_apo) == false) {
         setLogicLinkAusgang($id,1,$next_apo->name);
         setLogicLinkAusgang($id,2,$next_apo->strasse);
